@@ -99,12 +99,15 @@ function sendEmail(to_name, to_email, from_name, from_email, subject, message_ht
 // Communicate with the Tumblr Blog and send the emails
 // ++
 
+// I stored the API keys in a separate file which I did not upload to GitHub for privacy/security
+var tumblrAPIKeys = require('./tumblrAPIKeys');
+
 // Authenticate via OAuth
 var client = tumblr.createClient({
-  consumer_key: 'gzwzRTO1MYKfnjh1LrJsr4mIMJ4B5PiQ65TdcfHC3haAMTrUPc',
-  consumer_secret: 'DPRc638wUZDn1tYQHaaUMLAfeKgfE33yKR04hDAt1eEppmp06A',
-  token: 'NrApLSrEGTYe5MoSrs9hnmsRAOkxm7RUmQmb6W6U6V5HJbInfL',
-  token_secret: 'u1ooa9XkeQjeCJNmNXninQLyEyDjt4SAYoEC0ZP3kQg1BFBLxF'
+  consumer_key: tumblrAPIKeys.tumblrAPIKeys.consumer_key,
+  consumer_secret: tumblrAPIKeys.tumblrAPIKeys.consumer_secret,
+  token: tumblrAPIKeys.tumblrAPIKeys.token,
+  token_secret: tumblrAPIKeys.tumblrAPIKeys.token_secret
 });
 
 // Access tumblr posts and pass recent posts to the email function
