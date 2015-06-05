@@ -4,6 +4,9 @@ var ejs = require('ejs');
 var tumblr = require('tumblr.js');
 var mandrill = require('mandrill-api/mandrill');
 
+// I stored the API keys in a separate file which I did not upload to GitHub for privacy/security
+var mailerAPIKeys = require('./mailerAPIKeys');
+
 // Set some email variables for convenience
 var myName = 'Jack Mulrow';
 var myEmail = 'jack.mulrow@gmail.com';
@@ -14,14 +17,6 @@ var subjectHeader = "How's it going?";
 // ++
 
 var csvFile = fs.readFileSync('friend_list.csv', 'utf8');
-
-// // object consturctor to store contacts' information
-// function Contact(firstName, lastName, numMonthsSinceContact, emailAddress) {
-// 	this.firstName = firstName;
-// 	this.lastName = lastName;
-// 	this.numMonthsSinceContact = numMonthsSinceContact;
-// 	this.emailAddress = emailAddress;
-// };
 
 function csvParse(file) {
 	// remove the header and put actual data in an array separated by newlines
@@ -36,8 +31,8 @@ function csvParse(file) {
 		// put contact information in an object
 		contact = { firstName: attr[0],
 				    lastName: attr[1],
-				    numMonthsSinceContact = attr[2],
-				    emailAddress = attr[3]
+				    numMonthsSinceContact: attr[2],
+				    emailAddress: attr[3]
 				  };
 		// and store that object in an array
 		parsedData.push(contact);
@@ -73,7 +68,7 @@ function createCustomEmails(data, latestPosts) {
 // Create a function to send emails using the Mandrill API
 // ++
 
-var mandrill_client = new mandrill.Mandrill('8CgIx0oVtLaaJEVG2pD4_A');
+var mandrill_client = new mandrill.Mandrill(mailerAPIKeys.mandrillAPIKey);
 
 function sendEmail(to_name, to_email, from_name, from_email, subject, message_html){
     var message = {
@@ -96,13 +91,11 @@ function sendEmail(to_name, to_email, from_name, from_email, subject, message_ht
     };
     var async = false;
     var ip_pool = "Main Pool";
-    mandrill_client.messages.send({"message": message, "async": async, "ip_pool": ip_pool}, function(result) {
-        // console.log(message);
-        // console.log(result);   
+    mandrill_client.messages.send({"message": message, "async": async, "ip_pool": ip_pool}, function(result) {   
     }, function(e) {
         // Mandrill returns the error as an object with name and message keys
         console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-        // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+        // E.g. A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
     });
  };
 
@@ -110,15 +103,12 @@ function sendEmail(to_name, to_email, from_name, from_email, subject, message_ht
 // Communicate with the Tumblr Blog and send the customized emails
 // ++
 
-// I stored the API keys in a separate file which I did not upload to GitHub for privacy/security
-var tumblrAPIKeys = require('./tumblrAPIKeys');
-
 // Authenticate via OAuth
 var client = tumblr.createClient({
-  consumer_key: tumblrAPIKeys.tumblrAPIKeys.consumer_key,
-  consumer_secret: tumblrAPIKeys.tumblrAPIKeys.consumer_secret,
-  token: tumblrAPIKeys.tumblrAPIKeys.token,
-  token_secret: tumblrAPIKeys.tumblrAPIKeys.token_secret
+  consumer_key: mailerAPIKeys.tumblrAPIKeys.consumer_key,
+  consumer_secret: mailerAPIKeys.tumblrAPIKeys.consumer_secret,
+  token: mailerAPIKeys.tumblrAPIKeys.token,
+  token_secret: mailerAPIKeys.tumblrAPIKeys.token_secret
 });
 
 // Access tumblr posts and pass recent posts to the email function
