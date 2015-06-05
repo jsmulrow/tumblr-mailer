@@ -15,22 +15,32 @@ var subjectHeader = "How's it going?";
 
 var csvFile = fs.readFileSync('friend_list.csv', 'utf8');
 
-// object consturctor to store contacts' information
-function Contact(firstName, lastName, numMonthsSinceContact, emailAddress) {
-	this.firstName = firstName;
-	this.lastName = lastName;
-	this.numMonthsSinceContact = numMonthsSinceContact;
-	this.emailAddress = emailAddress;
-};
+// // object consturctor to store contacts' information
+// function Contact(firstName, lastName, numMonthsSinceContact, emailAddress) {
+// 	this.firstName = firstName;
+// 	this.lastName = lastName;
+// 	this.numMonthsSinceContact = numMonthsSinceContact;
+// 	this.emailAddress = emailAddress;
+// };
 
 function csvParse(file) {
 	// remove the header and put actual data in an array separated by newlines
 	var data = file.split('\n').slice(1);
 	var parsedData = [];
+	// initialize some variables inside for loop before to save processing time
+	var contact;
+	var attr;
 	for (var i = 0; i < data.length; i++) {
 		// split each line using commas
-		var attr = data[i].split(',');
-		parsedData.push(new Contact(attr[0], attr[1], attr[2], attr[3]));
+		attr = data[i].split(',');
+		// put contact information in an object
+		contact = { firstName: attr[0],
+				    lastName: attr[1],
+				    numMonthsSinceContact = attr[2],
+				    emailAddress = attr[3]
+				  };
+		// and store that object in an array
+		parsedData.push(contact);
 	}
 	return parsedData;
 };
@@ -44,8 +54,9 @@ var csv_data = csvParse(csvFile);
 function createCustomEmails(data, latestPosts) {
 	var emailTemplate = fs.readFileSync('email_template.html', 'utf8');
 	var emailArray = [];
+	var customizedTemplate;
 	data.forEach(function(contact) {
-		var customizedTemplate = ejs.render(emailTemplate, 
+		customizedTemplate = ejs.render(emailTemplate, 
 			{ firstName: contact.firstName,
 			  numMonthsSinceContact: contact.numMonthsSinceContact,
 		      latestPosts: latestPosts
@@ -96,7 +107,7 @@ function sendEmail(to_name, to_email, from_name, from_email, subject, message_ht
  };
 
 // ++
-// Communicate with the Tumblr Blog and send the emails
+// Communicate with the Tumblr Blog and send the customized emails
 // ++
 
 // I stored the API keys in a separate file which I did not upload to GitHub for privacy/security
